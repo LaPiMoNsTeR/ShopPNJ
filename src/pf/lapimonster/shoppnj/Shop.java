@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.Villager.Profession;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -21,9 +22,9 @@ public class Shop
 	private Inventory inventory;
 	private List<ShopItemStack> shopItemstacks = new ArrayList<ShopItemStack>();
 	
-	private ShopVillagerMoveCanceller villagerMoveCanceller;
-	
 	private static List<Shop> shops = new ArrayList<Shop>();
+	
+	private static ShopVillagerMoveCanceller runnable = new ShopVillagerMoveCanceller();
 	
 	public Shop(String name, int iSize)
 	{
@@ -41,13 +42,12 @@ public class Shop
 		
 		this.villager = (Villager) this.spawn.getWorld().spawnEntity(this.spawn, EntityType.VILLAGER);
 		this.villager.setAdult();
+		this.villager.setAI(false);
+		this.villager.setProfession(Profession.FARMER);
 		this.villager.setMetadata("shop", new FixedMetadataValue(ShopPNJ.getInstance(), this.getName()));
 		
 		this.hologram = new Hologram(new String[] {"§e§lCLIQUE DROIT", "§bMarchant Général"});
 		this.hologram.load(this.spawn);
-		
-		this.villagerMoveCanceller = new ShopVillagerMoveCanceller(this);
-		this.villagerMoveCanceller.start();
 		
 		this.inventory = Bukkit.createInventory(null, iSize, this.name);
 		
@@ -66,7 +66,6 @@ public class Shop
 	public void unspawn()
 	{
 		this.hologram.unload();
-		this.villagerMoveCanceller.stop();
 		this.villager.setHealth(0D);
 	}
 	
@@ -83,6 +82,11 @@ public class Shop
 	public Villager getVillager()
 	{
 		return this.villager;
+	}
+	
+	public Hologram getHologram()
+	{
+		return hologram;
 	}
 	
 	public Inventory getInventory()
@@ -104,6 +108,8 @@ public class Shop
 	{
 		this.spawn = spawn;
 		this.villager.teleport(this.spawn);
+		this.hologram.unload();
+		this.hologram.load(this.spawn);
 		ShopPNJ.getInstance().getShopConfig().getConfig().set(this.name, this.spawn.serialize());
 		ShopPNJ.getInstance().getShopConfig().saveConfig();
 	}
@@ -144,5 +150,10 @@ public class Shop
 	public static List<Shop> getShops()
 	{
 		return shops;
+	}
+	
+	public static ShopVillagerMoveCanceller getRunnable()
+	{
+		return runnable;
 	}
 }

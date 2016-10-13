@@ -35,9 +35,20 @@ public class Hologram
 	
 	public void unload()
 	{
-		this.lines = new LinkedList<String>();
 		for(ArmorStand as : this.armorStands)
 			as.remove();
 		this.armorStands = new LinkedList<ArmorStand>();
+	}
+	
+	public void clear()
+	{
+		this.unload();
+		this.lines = new LinkedList<String>();
+	}
+	
+	public void setLines(String... lines)
+	{
+		this.lines = new LinkedList<String>();
+		this.lines.addAll(Arrays.asList(lines));
 	}
 }

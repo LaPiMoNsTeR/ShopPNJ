@@ -33,8 +33,6 @@ public class ShopCommands implements CommandExecutor
 					name += args[i]+" ";
 				name = name.substring(0, name.length()-1);
 				
-				player.sendMessage(name);
-				
 				Shop shop = Shop.getByName(name);
 				
 				if(shop == null)

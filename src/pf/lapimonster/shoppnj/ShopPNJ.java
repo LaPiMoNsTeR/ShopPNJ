@@ -21,11 +21,15 @@ public class ShopPNJ extends JavaPlugin
 		this.getCommand("shoppnj").setExecutor(new ShopCommands());
 		this.getServer().getPluginManager().registerEvents(new ShopListener(), this);
 		new ShopManager();
+		
+		Shop.getRunnable().start();
 	}
 	
 	@Override
 	public void onDisable()
 	{
+		Shop.getRunnable().stop();
+		
 		for(Player player : this.getServer().getOnlinePlayers())
 		{
 			if(player.getOpenInventory() == null) continue;
