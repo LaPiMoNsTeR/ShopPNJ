@@ -16,11 +16,13 @@ public class ShopListener implements Listener
 	@EventHandler
 	public void onInteractEntity(PlayerInteractEntityEvent e)
 	{
-		if(e.getRightClicked() instanceof Villager)
+		if(e.getRightClicked() instanceof Villager && e.getPlayer() != null)
 		{
-			if(Shop.getByVillager((Villager) e.getRightClicked()) != null)
+			Villager villager = (Villager) e.getRightClicked();
+			if(villager.hasMetadata("shop"))
 			{
-				ShopOpening shopOpening = new ShopOpening(Shop.getByVillager((Villager) e.getRightClicked()), e.getPlayer());
+				String shop = villager.getMetadata("shop").get(0).asString();
+				ShopOpening shopOpening = new ShopOpening(Shop.getByName(shop), e.getPlayer());
 				shopOpening.openInventory();
 			}
 		}
@@ -35,6 +37,12 @@ public class ShopListener implements Listener
 			
 			if(shopOpening != null)
 			{
+				if(e.getInventory().getName().equals("mob.villager"))
+				{
+					e.setCancelled(true);
+					return;
+				}
+				
 				Shop shop = shopOpening.getShop();
 				
 				if(!shopOpening.getShop().getInventory().equals(e.getInventory()))
@@ -49,17 +57,24 @@ public class ShopListener implements Listener
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e)
 	{
-		if(e.getCurrentItem() == null)
-			return;
-		if(e.getCurrentItem().getType() == Material.AIR)
-			return;
-		
 		ShopOpening shopOpening = ShopOpening.getByPlayer((Player) e.getWhoClicked());
 		
 		if(shopOpening != null)
 		{
+			if(e.getCurrentItem() == null)
+				return;
+			if(e.getCurrentItem().getType() == Material.AIR)
+				return;
+			
+			if(e.getClickedInventory() == e.getWhoClicked().getInventory())
+			{
+				e.setCancelled(true);
+				return;
+			}
+			
 			ShopItemStack itemstack = shopOpening.getShop().getShopItemStack(e.getCurrentItem());
-			((Player) e.getWhoClicked()).sendMessage(itemstack.getName());
+			((Player) e.getWhoClicked()).sendMessage(itemstack.getName()+" : "+itemstack.getRinaCoins()+" Rinacoins");
+			e.getWhoClicked().getInventory().addItem(itemstack.getProduct());
 			e.setCancelled(true);
 		}
 	}

@@ -7,14 +7,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 
 public class Shop
 {
 	private String name;
 	private Location spawn;
 	private Villager villager;
+	private Hologram hologram;
 	private Inventory inventory;
 	private List<ShopItemStack> shopItemstacks = new ArrayList<ShopItemStack>();
 	
@@ -22,20 +25,37 @@ public class Shop
 	
 	private static List<Shop> shops = new ArrayList<Shop>();
 	
-	public Shop(String name, Location location, int iSize)
+	public Shop(String name, int iSize)
 	{
 		shops.add(this);
 		this.name = name;
-		this.spawn = location;
+		
+		try
+		{
+			this.spawn = Location.deserialize(ShopPNJ.getInstance().getShopConfig().getConfig().getConfigurationSection(this.name).getValues(false));
+		}
+		catch(Exception e)
+		{
+			this.spawn = Bukkit.getServer().getWorlds().get(0).getSpawnLocation();
+		}
+		
 		this.villager = (Villager) this.spawn.getWorld().spawnEntity(this.spawn, EntityType.VILLAGER);
 		this.villager.setAdult();
-		this.villager.setCustomName(this.name);
-		this.villager.setCustomNameVisible(false);
+		this.villager.setMetadata("shop", new FixedMetadataValue(ShopPNJ.getInstance(), this.getName()));
+		
+		this.hologram = new Hologram(new String[] {"§e§lCLIQUE DROIT", "§bMarchant Général"});
+		this.hologram.load(this.spawn);
 		
 		this.villagerMoveCanceller = new ShopVillagerMoveCanceller(this);
 		this.villagerMoveCanceller.start();
 		
-		this.inventory = Bukkit.createInventory(null, iSize, "");
+		this.inventory = Bukkit.createInventory(null, iSize, this.name);
+		
+		
+		Bukkit.getServer().getLogger().info("[ShopPNJ] Shop "+this.getName()+" chargé.");
+		
+		PlayerInteractEntityEvent event = new PlayerInteractEntityEvent(null, this.villager);
+		Bukkit.getServer().getPluginManager().callEvent(event);
 	}
 	
 	public void remove()
@@ -45,6 +65,7 @@ public class Shop
 	
 	public void unspawn()
 	{
+		this.hologram.unload();
 		this.villagerMoveCanceller.stop();
 		this.villager.setHealth(0D);
 	}
@@ -73,15 +94,18 @@ public class Shop
 	{
 		for(ShopItemStack i : this.shopItemstacks)
 		{
-			System.out.println("test : "+i.toString());
-			System.out.println("sujet : "+itemstack.toString());
 			if(i.isSimilar(itemstack))
 				return i;
-			
-			System.out.println("______");
 		}
-		
 		return null;
+	}
+	
+	public void setSpawn(Location spawn)
+	{
+		this.spawn = spawn;
+		this.villager.teleport(this.spawn);
+		ShopPNJ.getInstance().getShopConfig().getConfig().set(this.name, this.spawn.serialize());
+		ShopPNJ.getInstance().getShopConfig().saveConfig();
 	}
 	
 	
@@ -95,6 +119,17 @@ public class Shop
 		this.inventory.setContents(this.shopItemstacks.toArray(new ItemStack[this.shopItemstacks.size()]));
 	}
 	
+	
+	public static Shop getByName(String name)
+	{
+		for(Shop shop : shops)
+		{
+			if(shop.getName().equals(name))
+				return shop;
+		}
+		
+		return null;
+	}
 	
 	public static Shop getByVillager(Villager villager)
 	{

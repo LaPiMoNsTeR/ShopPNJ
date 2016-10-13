@@ -18,14 +18,16 @@ public class ShopOpening implements Runnable
 		shopOpenings.add(this);
 		this.shop = shop;
 		this.player = player;
-		
-		System.out.println("shopOpening create : "+player.getName());
 	}
 	
 	public void remove()
 	{
-		System.out.println("shopOpening remove : "+player.getName());
 		shopOpenings.remove(this);
+	}
+	
+	public boolean isRemoved()
+	{
+		return !shopOpenings.contains(this);
 	}
 	
 	public Shop getShop()

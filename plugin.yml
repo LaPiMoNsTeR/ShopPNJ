@@ -2,3 +2,12 @@ name: ShopPNJ
 version: 1.0
 author: lapimonster
 main: pf.lapimonster.shoppnj.ShopPNJ
+commands:
+  shoppnj:
+    description: ShopPNJ Commands
+    permission: shoppnj.admin
+    usage: /shoppnj
+
+permissions:
+  shoppnj.admin:
+    default: op

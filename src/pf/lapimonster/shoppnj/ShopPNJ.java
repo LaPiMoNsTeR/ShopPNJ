@@ -9,11 +9,16 @@ public class ShopPNJ extends JavaPlugin
 {
 	private static ShopPNJ instance;
 	
+	private ShopConfig shopConfig;
+	
 	@Override
 	public void onEnable()
 	{
 		instance = this;
 		
+		this.shopConfig = new ShopConfig(this);
+		
+		this.getCommand("shoppnj").setExecutor(new ShopCommands());
 		this.getServer().getPluginManager().registerEvents(new ShopListener(), this);
 		new ShopManager();
 	}
@@ -26,8 +31,8 @@ public class ShopPNJ extends JavaPlugin
 			if(player.getOpenInventory() == null) continue;
 			for(Shop shop : Shop.getShops())
 			{
-				if(player.getOpenInventory().equals(shop.getInventory()))
-					player.closeInventory();;
+				if(player.getOpenInventory().getTitle().equals(shop.getInventory().getTitle()))
+					player.closeInventory();
 			}
 		}
 		
@@ -40,7 +45,12 @@ public class ShopPNJ extends JavaPlugin
 		}
 	}
 	
+	public ShopConfig getShopConfig()
+	{
+		return shopConfig;
+	}
 	
+
 	public static ShopPNJ getInstance()
 	{
 		return instance;

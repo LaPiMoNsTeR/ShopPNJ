@@ -10,8 +10,9 @@ public class ShopItemStack extends ItemStack
 {
 	private String name;
 	private int rinaCoins;
+	private ItemStack product;
 	
-	public ShopItemStack(String name, ItemStack itemstack, int rinaCoins)
+	public ShopItemStack(String name, ItemStack itemstack, int rinaCoins, ItemStack product)
 	{
 		super(itemstack);
 		this.name = name;
@@ -25,6 +26,8 @@ public class ShopItemStack extends ItemStack
 		lore.add("§bCliquez-gauche §7pour acheter §aà l'unité §7!");
 		meta.setLore(lore);
 		this.setItemMeta(meta);
+		
+		this.product = product;
 	}
 	
 	public String getName()
@@ -37,8 +40,18 @@ public class ShopItemStack extends ItemStack
 		return rinaCoins;
 	}
 	
+	public ItemStack getProduct()
+	{
+		return product;
+	}
+	
 	public void setRinaCoins(int rinaCoins)
 	{
 		this.rinaCoins = rinaCoins;
+	}
+	
+	public void setProduct(ItemStack product)
+	{
+		this.product = product;
 	}
 }
