@@ -22,13 +22,13 @@ public class ShopPNJ extends JavaPlugin
 		this.getServer().getPluginManager().registerEvents(new ShopListener(), this);
 		new ShopManager();
 		
-		Shop.getRunnable().start();
+		// Shop.getRunnable().start();
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		Shop.getRunnable().stop();
+		// Shop.getRunnable().stop();
 		
 		for(Player player : this.getServer().getOnlinePlayers())
 		{

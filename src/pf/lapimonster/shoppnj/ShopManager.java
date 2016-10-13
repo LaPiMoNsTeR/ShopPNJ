@@ -8,7 +8,7 @@ public class ShopManager
 	@SuppressWarnings("deprecation")
 	public ShopManager()
 	{
-		Shop shop1 = new Shop("Shop-1", 9);
+		Shop shop1 = new Shop("Marchant Général", 9);
 		
 		ItemStack poisson = new ItemStack(Material.RAW_FISH, 1);
 		ItemStack patate = new ItemStack(392, 1);
@@ -24,8 +24,12 @@ public class ShopManager
 		
 		shop1.updateInventory();
 		
+		shop1.getHologram().unload();
+		shop1.getHologram().setLines(new String[] {"§e§lCLIQUE DROIT", "§bMarchant Général"});
+		shop1.getHologram().load(shop1.getSpawn());
 		
-		Shop shop2 = new Shop("Shop-2", 3*9);
+		
+		Shop shop2 = new Shop("Marchant d'armes", 3*9);
 		ItemStack i1 = new ItemStack(Material.DIAMOND_SWORD, 1);
 		ItemStack i2 = new ItemStack(Material.DIAMOND_PICKAXE, 1);
 		ItemStack i3 = new ItemStack(Material.DIAMOND_SPADE, 1);

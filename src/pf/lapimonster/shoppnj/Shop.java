@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -21,10 +21,9 @@ public class Shop
 	private Hologram hologram;
 	private Inventory inventory;
 	private List<ShopItemStack> shopItemstacks = new ArrayList<ShopItemStack>();
+	private ShopVillagerRepositioning shopVillagerRepositioning = new ShopVillagerRepositioning(this);
 	
 	private static List<Shop> shops = new ArrayList<Shop>();
-	
-	private static ShopVillagerMoveCanceller runnable = new ShopVillagerMoveCanceller();
 	
 	public Shop(String name, int iSize)
 	{
@@ -42,24 +41,26 @@ public class Shop
 		
 		this.villager = (Villager) this.spawn.getWorld().spawnEntity(this.spawn, EntityType.VILLAGER);
 		this.villager.setAdult();
-		this.villager.setAI(false);
+		this.villager.setAI(true);
+		this.villager.setCollidable(false);
+		this.villager.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0D);
 		this.villager.setProfession(Profession.FARMER);
 		this.villager.setMetadata("shop", new FixedMetadataValue(ShopPNJ.getInstance(), this.getName()));
 		
-		this.hologram = new Hologram(new String[] {"§e§lCLIQUE DROIT", "§bMarchant Général"});
+		this.hologram = new Hologram(new String[] {this.name});
 		this.hologram.load(this.spawn);
 		
 		this.inventory = Bukkit.createInventory(null, iSize, this.name);
 		
+		this.shopVillagerRepositioning.start();
+		
 		
 		Bukkit.getServer().getLogger().info("[ShopPNJ] Shop "+this.getName()+" chargé.");
-		
-		PlayerInteractEntityEvent event = new PlayerInteractEntityEvent(null, this.villager);
-		Bukkit.getServer().getPluginManager().callEvent(event);
 	}
 	
 	public void remove()
 	{
+		this.shopVillagerRepositioning.stop();
 		shops.remove(this);
 	}
 	
@@ -104,9 +105,9 @@ public class Shop
 		return null;
 	}
 	
-	public void setSpawn(Location spawn)
+	public void setSpawn(Location location)
 	{
-		this.spawn = spawn;
+		this.spawn = location;
 		this.villager.teleport(this.spawn);
 		this.hologram.unload();
 		this.hologram.load(this.spawn);
@@ -150,10 +151,5 @@ public class Shop
 	public static List<Shop> getShops()
 	{
 		return shops;
-	}
-	
-	public static ShopVillagerMoveCanceller getRunnable()
-	{
-		return runnable;
 	}
 }

@@ -26,6 +26,7 @@ public class Hologram
 			as.setCustomName(str);
 			as.setCustomNameVisible(true);
 			as.setInvulnerable(true);
+			as.setCollidable(false);
 			as.setGravity(false);
 			as.setVisible(false);
 			this.armorStands.add(as);
