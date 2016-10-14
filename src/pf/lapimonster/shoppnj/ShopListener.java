@@ -1,6 +1,7 @@
 package pf.lapimonster.shoppnj;
 
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
@@ -10,6 +11,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+
+import net.milkbowl.vault.economy.Economy;
 
 public class ShopListener implements Listener
 {
@@ -73,8 +76,16 @@ public class ShopListener implements Listener
 			}
 			
 			ShopItemStack itemstack = shopOpening.getShop().getShopItemStack(e.getCurrentItem());
-			((Player) e.getWhoClicked()).sendMessage(itemstack.getName()+" : "+itemstack.getRinaCoins()+" Rinacoins");
-			e.getWhoClicked().getInventory().addItem(itemstack.getProduct());
+			
+			Economy eco = ShopPNJ.getEconomy();
+			
+			if(eco.has((OfflinePlayer) e.getWhoClicked(), itemstack.getRinaCoins()))
+			{
+				((Player) e.getWhoClicked()).sendMessage("Vous avez acheté 1 §a"+itemstack.getName()+" §rà §c"+itemstack.getRinaCoins()+" Rinacoins§r.");
+				e.getWhoClicked().getInventory().addItem(itemstack.getProduct());
+				eco.withdrawPlayer((OfflinePlayer) e.getWhoClicked(), itemstack.getRinaCoins());
+			}
+			else e.getWhoClicked().sendMessage("§cVous n'avez pas assez d'argent pour acheter cette item.");
 			e.setCancelled(true);
 		}
 	}
