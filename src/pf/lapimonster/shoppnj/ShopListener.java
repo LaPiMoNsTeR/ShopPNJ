@@ -95,8 +95,13 @@ public class ShopListener implements Listener
 	{
 		if(e.getEntity() instanceof Villager)
 		{
-			if(Shop.getByVillager((Villager) e.getEntity()) != null)
-				e.setCancelled(true);
+			Villager villager = (Villager) e.getEntity();
+			if(villager.hasMetadata("shop"))
+			{
+				Shop shop = Shop.getByName(villager.getMetadata("shop").get(0).asString());
+				if(shop != null)
+					e.setCancelled(true);
+			}
 		}
 	}
 }
